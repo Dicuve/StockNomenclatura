@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nomenclatura Stock — Herramienta de Estudio</title>
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --surface2: #f1f0ec;
+    --border: #e2e0d8;
+    --border2: #cccac0;
+    --text: #1a1917;
+    --text2: #6b6860;
+    --text3: #9e9c96;
+    --accent: #2563eb;
+    --accent-bg: #eff6ff;
+    --accent-text: #1d4ed8;
+    --success: #16a34a;
+    --success-bg: #f0fdf4;
+    --success-border: #bbf7d0;
+    --danger: #dc2626;
+    --danger-bg: #fef2f2;
+    --danger-border: #fecaca;
+    --warning: #b45309;
+    --warning-bg: #fffbeb;
+    --warning-border: #fde68a;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  .app { max-width: 720px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* HUB */
+  .hub-header { text-align: center; padding: 2rem 0 1.75rem; }
+  .hub-logo { font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; }
+  .hub-title { font-size: 28px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+  .hub-sub { font-size: 15px; color: var(--text2); margin-top: 6px; }
+
+  .section-label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text3); margin-bottom: 10px; margin-top: 1.5rem; }
+
+  .module-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  @media(min-width:500px){ .module-grid { grid-template-columns: repeat(4,1fr); } }
+  .module-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .module-card:hover { border-color: var(--border2); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .mc-icon { font-size: 20px; margin-bottom: 8px; }
+  .mc-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .mc-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+  .mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mode-btn { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; cursor: pointer; text-align: left; transition: border-color 0.15s; }
+  .mode-btn:hover { border-color: var(--accent); }
+  .mb-icon { font-size: 18px; margin-bottom: 6px; }
+  .mb-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .mb-desc { font-size: 12px; color: var(--text2); margin-top: 3px; line-height: 1.4; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: center; gap: 12px; padding-bottom: 1.25rem; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .back-btn { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 6px 12px; cursor: pointer; font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .back-btn:hover { border-color: var(--border2); }
+  .page-title { font-size: 20px; font-weight: 700; color: var(--text); }
+  .page-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+
+  /* THEORY */
+  .theory-section { margin-bottom: 1.5rem; }
+  .theory-section h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+  .theory-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 8px; font-size: 14px; color: var(--text2); line-height: 1.7; }
+  .theory-block strong { color: var(--text); }
+  .formula-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .formula-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .formula-tag { font-family: 'Courier New', monospace; background: var(--accent-bg); color: var(--accent-text); padding: 2px 9px; border-radius: 4px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .formula-name { color: var(--text); flex: 1; }
+  .formula-nox { color: var(--text3); font-size: 11px; white-space: nowrap; }
+  .rule-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 8px; background: var(--surface); }
+  .rule-step { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; margin-bottom: 8px; color: var(--text2); line-height: 1.5; }
+  .rule-step:last-child { margin-bottom: 0; }
+  .step-num { background: var(--accent-bg); color: var(--accent-text); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+  /* PRACTICE */
+  .score-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 1.25rem; }
+  .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+  .score-num { font-size: 26px; font-weight: 700; color: var(--text); }
+  .score-label { font-size: 11px; color: var(--text3); margin-top: 3px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; align-items: center; }
+  .filter-label { font-size: 11px; color: var(--text3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .filter-btn { border: 1px solid var(--border); background: var(--surface); color: var(--text2); padding: 4px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.12s; }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { border-color: var(--accent); background: var(--accent-bg); color: var(--accent-text); }
+
+  .exercise-area { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .ex-type-badge { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text3); margin-bottom: 10px; }
+  .ex-question { font-size: 24px; font-weight: 700; color: var(--text); margin-bottom: 6px; font-family: 'Courier New', monospace; letter-spacing: 0.02em; }
+  .ex-direction { font-size: 13px; color: var(--text2); margin-bottom: 1.25rem; }
+  .ex-input { width: 100%; font-size: 15px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); margin-bottom: 12px; outline: none; transition: border-color 0.15s; }
+  .ex-input:focus { border-color: var(--accent); }
+  .btn-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .btn-primary { background: var(--text); color: #fff; border: none; padding: 8px 18px; border-radius: var(--radius-sm); cursor: pointer; font-size: 14px; font-weight: 600; transition: opacity 0.15s; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-secondary { background: var(--surface); border: 1px solid var(--border); color: var(--text2); padding: 8px 16px; border-radius: var(--radius-sm); cursor: pointer; font-size: 13px; }
+  .btn-secondary:hover { border-color: var(--border2); }
+  .btn-hint { background: none; border: 1px dashed var(--border2); color: var(--text3); padding: 6px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 12px; margin-left: auto; }
+  .btn-hint:hover { color: var(--warning); border-color: var(--warning); }
+
+  .feedback-box { padding: 12px 16px; border-radius: var(--radius-sm); margin-top: 12px; font-size: 14px; line-height: 1.5; display: none; }
+  .feedback-box.correct { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+  .feedback-box.wrong { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .feedback-box.hint { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning-border); }
+
+  .ex-counter { font-size: 12px; color: var(--text3); text-align: right; margin-top: 8px; }
+
+  /* EXAM */
+  .progress-wrap { height: 5px; background: var(--surface2); border-radius: 3px; margin-bottom: 1rem; overflow: hidden; }
+  .progress-bar { height: 5px; background: var(--accent); border-radius: 3px; transition: width 0.4s ease; }
+  .exam-counter-label { font-size: 13px; color: var(--text2); margin-bottom: 1rem; font-weight: 500; }
+
+  .results-header { text-align: center; padding: 1.5rem 0; }
+  .results-pct { font-size: 48px; font-weight: 800; color: var(--text); letter-spacing: -2px; }
+  .results-msg { font-size: 15px; color: var(--text2); margin-top: 6px; }
+  .results-list { margin: 1rem 0 1.5rem; }
+  .result-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .result-item:last-child { border-bottom: none; }
+  .result-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .result-icon.ok { background: var(--success-bg); color: var(--success); }
+  .result-icon.bad { background: var(--danger-bg); color: var(--danger); }
+  .result-q { color: var(--text2); margin-bottom: 2px; font-family: 'Courier New', monospace; }
+  .result-a { font-weight: 600; color: var(--text); }
+  .result-yours { color: var(--danger); font-size: 12px; }
+
+  .bank-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text3); margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HUB -->
+<div id="screen-hub" class="screen active">
+  <div class="hub-header">
+    <div class="hub-logo">⚗️ Química · Nomenclatura</div>
+    <div class="hub-title">Nomenclatura Stock</div>
+    <div class="hub-sub">Estudia, practica y examínate · basado en tus apuntes</div>
+  </div>
+
+  <div class="section-label">Teoría por módulo</div>
+  <div class="module-grid">
+    <div class="module-card" onclick="showTheory('iones')">
+      <div class="mc-icon">⚡</div>
+      <div class="mc-title">Iones</div>
+      <div class="mc-sub">Cationes y aniones</div>
+    </div>
+    <div class="module-card" onclick="showTheory('oxidos')">
+      <div class="mc-icon">🔴</div>
+      <div class="mc-title">Óxidos</div>
+      <div class="mc-sub">Metal y no metal</div>
+    </div>
+    <div class="module-card" onclick="showTheory('hidracidos')">
+      <div class="mc-icon">💧</div>
+      <div class="mc-title">Hidróxidos</div>
+      <div class="mc-sub">Acuosos y gaseosos</div>
+    </div>
+    <div class="module-card" onclick="showTheory('sales')">
+      <div class="mc-icon">🧂</div>
+      <div class="mc-title">Sales binarias</div>
+      <div class="mc-sub">Metal + no metal</div>
+    </div>
+  </div>
+
+  <div class="section-label">Modo de práctica</div>
+  <div class="mode-row">
+    <button class="mode-btn" onclick="startStudy()">
+      <div class="mb-icon">📖</div>
+      <div class="mb-label">Modo estudio</div>
+      <div class="mb-desc">Con pistas y explicaciones. Sin límite de tiempo.</div>
+    </button>
+    <button class="mode-btn" onclick="startExam()">
+      <div class="mb-icon">📋</div>
+      <div class="mb-label">Modo examen</div>
+      <div class="mb-desc">10 preguntas sin ayuda. Te califica al final.</div>
+    </button>
+  </div>
+</div>
+
+<!-- THEORY -->
+<div id="screen-theory" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHub()">← Inicio</button>
+    <div>
+      <div class="page-title" id="theory-title"></div>
+      <div class="page-sub" id="theory-sub"></div>
+    </div>
+  </div>
+  <div id="theory-content"></div>
+  <button class="mode-btn" style="width:100%;margin-top:1rem;" onclick="startStudy()">
+    <div class="mb-label">Practicar →</div>
+    <div class="mb-desc">Ir al modo estudio con ejercicios</div>
+  </button>
+</div>
+
+<!-- STUDY -->
+<div id="screen-study" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHub()">← Inicio</button>
+    <div>
+      <div class="page-title">Modo estudio</div>
+      <div class="page-sub">Con pistas · ejercicios ilimitados</div>
+    </div>
+  </div>
+  <div class="score-row">
+    <div class="score-card"><div class="score-num" id="sc-correct">0</div><div class="score-label">Correctas</div></div>
+    <div class="score-card"><div class="score-num" id="sc-wrong">0</div><div class="score-label">Incorrectas</div></div>
+    <div class="score-card"><div class="score-num" id="sc-streak">0</div><div class="score-label">Racha 🔥</div></div>
+  </div>
+  <div class="filter-row">
+    <span class="filter-label">Filtrar:</span>
+    <button class="filter-btn active" onclick="setFilter('todos',this)">Todos</button>
+    <button class="filter-btn" onclick="setFilter('iones',this)">Iones</button>
+    <button class="filter-btn" onclick="setFilter('oxidos',this)">Óxidos</button>
+    <button class="filter-btn" onclick="setFilter('hidracidos',this)">Hidróxidos</button>
+    <button class="filter-btn" onclick="setFilter('sales',this)">Sales</button>
+  </div>
+  <div class="exercise-area">
+    <div class="ex-type-badge" id="ex-badge">—</div>
+    <div class="ex-question" id="ex-q">—</div>
+    <div class="ex-direction" id="ex-dir"></div>
+    <input class="ex-input" id="ex-in" placeholder="Tu respuesta aquí..." autocomplete="off" />
+    <div class="btn-row">
+      <button class="btn-primary" onclick="checkStudy()">Verificar</button>
+      <button class="btn-secondary" id="btn-next-study" style="display:none;" onclick="nextStudy()">Siguiente →</button>
+      <button class="btn-secondary" onclick="skipStudy()">Saltar</button>
+      <button class="btn-hint" id="btn-hint" onclick="showHint()">💡 Pista</button>
+    </div>
+    <div class="feedback-box" id="fb-study"></div>
+  </div>
+  <div class="bank-badge">📚 <span id="bank-count"></span> ejercicios en el banco</div>
+</div>
+
+<!-- EXAM -->
+<div id="screen-exam" class="screen">
+  <div class="page-header">
+    <button class="back-btn" onclick="goHub()">← Inicio</button>
+    <div>
+      <div class="page-title">Modo examen</div>
+      <div class="page-sub">10 preguntas · sin pistas</div>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-bar" id="exam-bar" style="width:0%"></div></div>
+  <div class="exam-counter-label" id="exam-counter">Pregunta 1 de 10</div>
+  <div class="exercise-area" id="exam-exercise-area">
+    <div class="ex-type-badge" id="exam-badge">—</div>
+    <div class="ex-question" id="exam-q">—</div>
+    <div class="ex-direction" id="exam-dir"></div>
+    <input class="ex-input" id="exam-in" placeholder="Tu respuesta aquí..." autocomplete="off" />
+    <div class="btn-row">
+      <button class="btn-primary" onclick="checkExam()">Confirmar</button>
+      <button class="btn-secondary" id="btn-next-exam" style="display:none;" onclick="nextExam()">Siguiente →</button>
+    </div>
+    <div class="feedback-box" id="fb-exam"></div>
+  </div>
+  <div id="exam-results" style="display:none;"></div>
+</div>
+
+</div>
+
+<script>
+const THEORY = {
+  iones: {
+    title: 'Iones — Cationes y Aniones',
+    sub: 'Partículas con carga · Nomenclatura Stock',
+    content: `
+      <div class="theory-section">
+        <h3>¿Qué es un ion?</h3>
+        <div class="theory-block">Un <strong>ion</strong> es una partícula con carga eléctrica. El <strong>número de oxidación (NOX)</strong> indica los electrones ganados o perdidos. Se escribe en romano entre paréntesis cuando el metal tiene más de un NOX posible.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Cationes (carga positiva +)</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>Fórmula: <strong>ion + nombre del elemento + (NOX en romano)</strong></div></div>
+          <div class="rule-step"><div class="step-num">2</div><div>Si el metal tiene un solo NOX posible, no se escribe el número romano</div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">Zn²⁺</span><span class="formula-name">ion zinc</span><span class="formula-nox">NOX único</span></div>
+          <div class="formula-row"><span class="formula-tag">Fe³⁺</span><span class="formula-name">ion hierro (III)</span><span class="formula-nox">NOX +3</span></div>
+          <div class="formula-row"><span class="formula-tag">Fe²⁺</span><span class="formula-name">ion hierro (II)</span><span class="formula-nox">NOX +2</span></div>
+          <div class="formula-row"><span class="formula-tag">Si²⁺</span><span class="formula-name">ion silicio (II)</span><span class="formula-nox">NOX +2</span></div>
+          <div class="formula-row"><span class="formula-tag">Pd²⁺</span><span class="formula-name">ion paladio (II)</span><span class="formula-nox">NOX +2</span></div>
+          <div class="formula-row"><span class="formula-tag">Mo⁶⁺</span><span class="formula-name">ion molibdeno (VI)</span><span class="formula-nox">NOX +6</span></div>
+        </div>
+      </div>
+      <div class="theory-section">
+        <h3>Aniones (carga negativa −)</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>Fórmula: <strong>ion + raíz del nombre del elemento + -uro</strong></div></div>
+          <div class="rule-step"><div class="step-num">2</div><div>Los aniones siempre tienen carga negativa (−)</div></div>
+          <div class="rule-step"><div class="step-num">3</div><div>Excepción: S²⁻ = ion <strong>sulfuro</strong> (viene del inglés "sulfur")</div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">Br⁻</span><span class="formula-name">ion bromuro</span></div>
+          <div class="formula-row"><span class="formula-tag">Cl⁻</span><span class="formula-name">ion cloruro</span></div>
+          <div class="formula-row"><span class="formula-tag">S²⁻</span><span class="formula-name">ion sulfuro</span><span class="formula-nox">excepción</span></div>
+          <div class="formula-row"><span class="formula-tag">O²⁻</span><span class="formula-name">ion óxido</span></div>
+          <div class="formula-row"><span class="formula-tag">I⁻</span><span class="formula-name">ion yoduro</span></div>
+          <div class="formula-row"><span class="formula-tag">F⁻</span><span class="formula-name">ion fluoruro</span></div>
+          <div class="formula-row"><span class="formula-tag">C⁴⁻</span><span class="formula-name">ion carburo</span></div>
+          <div class="formula-row"><span class="formula-tag">N³⁻</span><span class="formula-name">ion nitruro</span></div>
+          <div class="formula-row"><span class="formula-tag">P³⁻</span><span class="formula-name">ion fosfuro</span></div>
+          <div class="formula-row"><span class="formula-tag">As³⁻</span><span class="formula-name">ion arsenuro</span></div>
+          <div class="formula-row"><span class="formula-tag">Si⁻⁴</span><span class="formula-name">ion siluro</span></div>
+        </div>
+      </div>`
+  },
+  oxidos: {
+    title: 'Nomenclatura de Óxidos',
+    sub: 'Óxidos de metal y no metal',
+    content: `
+      <div class="theory-section">
+        <h3>Óxidos de metal</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>El anión siempre es oxígeno (O) con NOX de <strong>−2</strong></div></div>
+          <div class="rule-step"><div class="step-num">2</div><div>Nombre: <strong>óxido de [nombre del metal] (NOX)</strong></div></div>
+          <div class="rule-step"><div class="step-num">3</div><div>Para hallar subíndices: usa el MCM de las cargas cruzadas</div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">Na₂O</span><span class="formula-name">óxido de sodio</span></div>
+          <div class="formula-row"><span class="formula-tag">CaO</span><span class="formula-name">óxido de calcio</span></div>
+          <div class="formula-row"><span class="formula-tag">FeO</span><span class="formula-name">óxido de hierro (II)</span></div>
+          <div class="formula-row"><span class="formula-tag">Fe₂O₃</span><span class="formula-name">óxido de hierro (III)</span></div>
+          <div class="formula-row"><span class="formula-tag">SnO₂</span><span class="formula-name">óxido de estaño (IV)</span></div>
+          <div class="formula-row"><span class="formula-tag">Cu₂O</span><span class="formula-name">óxido de cobre (I)</span></div>
+          <div class="formula-row"><span class="formula-tag">CuO</span><span class="formula-name">óxido de cobre (II)</span></div>
+          <div class="formula-row"><span class="formula-tag">Al₂O₃</span><span class="formula-name">óxido de aluminio</span></div>
+          <div class="formula-row"><span class="formula-tag">BaO</span><span class="formula-name">óxido de bario</span></div>
+          <div class="formula-row"><span class="formula-tag">SnO</span><span class="formula-name">óxido de estaño (II)</span></div>
+        </div>
+      </div>
+      <div class="theory-section">
+        <h3>Óxidos de no metal (prefijos griegos)</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>Prefijos: <strong>mono, di, tri, tetra, penta, hexa, hepta, octa, nona, deca</strong></div></div>
+          <div class="rule-step"><div class="step-num">2</div><div>Nombre: <strong>[prefijo]óxido de [prefijo][no metal]</strong></div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">CO₂</span><span class="formula-name">dióxido de carbono</span></div>
+          <div class="formula-row"><span class="formula-tag">CO</span><span class="formula-name">monóxido de carbono</span></div>
+          <div class="formula-row"><span class="formula-tag">N₂O</span><span class="formula-name">monóxido de dinitrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">NO₂</span><span class="formula-name">dióxido de nitrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">SO₃</span><span class="formula-name">trióxido de azufre</span></div>
+          <div class="formula-row"><span class="formula-tag">SO₂</span><span class="formula-name">dióxido de azufre</span></div>
+          <div class="formula-row"><span class="formula-tag">P₂O₅</span><span class="formula-name">pentóxido de difósforo</span></div>
+        </div>
+      </div>`
+  },
+  hidracidos: {
+    title: 'Nomenclatura de Hidróxidos',
+    sub: 'Ácidos hidro · forma acuosa y gaseosa',
+    content: `
+      <div class="theory-section">
+        <h3>¿Qué son los hidróxidos?</h3>
+        <div class="theory-block">Se forman con <strong>H + no metal</strong>. Tienen dos formas según el estado físico: <strong>acuosa (aq)</strong> = disuelto en agua, y <strong>gaseosa (g)</strong>.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Forma acuosa → ácido [raíz]-hídrico</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>Fórmula: <strong>ácido + raíz del no metal + hídrico</strong></div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">HCl(aq)</span><span class="formula-name">ácido clorhídrico</span></div>
+          <div class="formula-row"><span class="formula-tag">HBr(aq)</span><span class="formula-name">ácido bromhídrico</span></div>
+          <div class="formula-row"><span class="formula-tag">HF(aq)</span><span class="formula-name">ácido fluorhídrico</span></div>
+          <div class="formula-row"><span class="formula-tag">HI(aq)</span><span class="formula-name">ácido yodhídrico</span></div>
+          <div class="formula-row"><span class="formula-tag">H₂S(aq)</span><span class="formula-name">ácido sulfhídrico</span></div>
+        </div>
+      </div>
+      <div class="theory-section">
+        <h3>Forma gaseosa → [anión]uro de hidrógeno</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div>Fórmula: <strong>raíz del anión + uro + de hidrógeno</strong></div></div>
+        </div>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">HCl(g)</span><span class="formula-name">cloruro de hidrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">HBr(g)</span><span class="formula-name">bromuro de hidrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">HF(g)</span><span class="formula-name">fluoruro de hidrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">HI(g)</span><span class="formula-name">yoduro de hidrógeno</span></div>
+          <div class="formula-row"><span class="formula-tag">H₂S(g)</span><span class="formula-name">sulfuro de hidrógeno</span></div>
+        </div>
+      </div>`
+  },
+  sales: {
+    title: 'Sales Binarias',
+    sub: 'Metal + no metal · Nomenclatura Stock',
+    content: `
+      <div class="theory-section">
+        <h3>¿Qué es una sal binaria?</h3>
+        <div class="theory-block">Sales binarias = <strong>metal (catión) + no metal (anión)</strong>. No contienen H ni O. Se nombran: <strong>[anión]uro de [catión] (NOX)</strong>. En el nombre, el orden se invierte respecto a la fórmula.</div>
+      </div>
+      <div class="theory-section">
+        <h3>¿Cómo calcular el NOX?</h3>
+        <div class="rule-card">
+          <div class="rule-step"><div class="step-num">1</div><div><strong>(NOX catión × cantidad) + (NOX anión × cantidad) = 0</strong></div></div>
+          <div class="rule-step"><div class="step-num">2</div><div>Se despeja x (el NOX del metal)</div></div>
+          <div class="rule-step"><div class="step-num">3</div><div>Para los subíndices: usa el <strong>MCM</strong> de los valores de las cargas</div></div>
+        </div>
+        <div class="theory-block"><strong>Ejemplo:</strong> Fe²⁺ + S²⁻ → MCM(2,2)=2 → FeS. Pero Fe³⁺ + S²⁻ → MCM(3,2)=6 → Fe₂S₃.</div>
+      </div>
+      <div class="theory-section">
+        <h3>Ejemplos de tus apuntes</h3>
+        <div class="theory-block">
+          <div class="formula-row"><span class="formula-tag">Fe₂S₃</span><span class="formula-name">sulfuro de hierro (III)</span><span class="formula-nox">Fe³⁺ S²⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">Ca₃P₂</span><span class="formula-name">fosfuro de calcio</span><span class="formula-nox">Ca²⁺ P³⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">Co₃N₂</span><span class="formula-name">nitruro de cobalto (II)</span><span class="formula-nox">Co²⁺ N³⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">SnI₄</span><span class="formula-name">yoduro de estaño (IV)</span><span class="formula-nox">Sn⁴⁺ I⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">NiBr₃</span><span class="formula-name">bromuro de níquel (III)</span><span class="formula-nox">Ni³⁺ Br⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">Al₄C₃</span><span class="formula-name">carburo de aluminio</span><span class="formula-nox">Al³⁺ C⁴⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">KBr</span><span class="formula-name">bromuro de potasio</span><span class="formula-nox">K⁺ Br⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">AgBr</span><span class="formula-name">bromuro de plata</span></div>
+          <div class="formula-row"><span class="formula-tag">MgI₂</span><span class="formula-name">yoduro de magnesio</span><span class="formula-nox">Mg²⁺ I⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">CaF₂</span><span class="formula-name">fluoruro de calcio</span><span class="formula-nox">Ca²⁺ F⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">VCl₃</span><span class="formula-name">cloruro de vanadio (III)</span><span class="formula-nox">V³⁺ Cl⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">MnS₃</span><span class="formula-name">sulfuro de manganeso (VI)</span><span class="formula-nox">Mn⁶⁺ S²⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">Mn₂S₃</span><span class="formula-name">sulfuro de manganeso (III)</span><span class="formula-nox">Mn³⁺ S²⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">FeCl₃</span><span class="formula-name">cloruro de hierro (III)</span><span class="formula-nox">Fe³⁺ Cl⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">HgCl₂</span><span class="formula-name">cloruro de mercurio (II)</span><span class="formula-nox">Hg²⁺ Cl⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">PbS</span><span class="formula-name">sulfuro de plomo (II)</span><span class="formula-nox">Pb²⁺ S²⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">SnCl₄</span><span class="formula-name">cloruro de estaño (IV)</span><span class="formula-nox">Sn⁴⁺ Cl⁻</span></div>
+          <div class="formula-row"><span class="formula-tag">CuCl₂</span><span class="formula-name">cloruro de cobre (II)</span><span class="formula-nox">Cu²⁺ Cl⁻</span></div>
+        </div>
+      </div>`
+  }
+};
+
+// ===================== EXERCISE BANK =====================
+// Each: { topic, category, q_fn, a_fn, hint }
+// direction: 'f2n' = formula→nombre, 'n2f' = nombre→formula
+
+const BANK = [
+  // --- IONES: Aniones ---
+  {cat:'iones', dir:'f2n', q:'Br⁻', a:'ion bromuro', hint:'Raíz de bromo + uro'},
+  {cat:'iones', dir:'f2n', q:'Cl⁻', a:'ion cloruro', hint:'Raíz de cloro + uro'},
+  {cat:'iones', dir:'f2n', q:'S²⁻', a:'ion sulfuro', hint:'Excepción: viene del inglés sulfur'},
+  {cat:'iones', dir:'f2n', q:'O²⁻', a:'ion óxido', hint:'Raíz de oxígeno + uro (excepción: óxido)'},
+  {cat:'iones', dir:'f2n', q:'I⁻', a:'ion yoduro', hint:'Raíz de yodo + uro'},
+  {cat:'iones', dir:'f2n', q:'F⁻', a:'ion fluoruro', hint:'Raíz de flúor + uro'},
+  {cat:'iones', dir:'f2n', q:'C⁴⁻', a:'ion carburo', hint:'Raíz de carbono + uro'},
+  {cat:'iones', dir:'f2n', q:'N³⁻', a:'ion nitruro', hint:'Raíz de nitrógeno + uro'},
+  {cat:'iones', dir:'f2n', q:'P³⁻', a:'ion fosfuro', hint:'Raíz de fósforo + uro'},
+  {cat:'iones', dir:'f2n', q:'As³⁻', a:'ion arsenuro', hint:'Raíz de arsénico + uro'},
+  {cat:'iones', dir:'f2n', q:'Si⁻⁴', a:'ion siluro', hint:'Raíz de silicio + uro'},
+  // --- IONES: Cationes ---
+  {cat:'iones', dir:'f2n', q:'Zn²⁺', a:'ion zinc', hint:'NOX único, no se pone número romano'},
+  {cat:'iones', dir:'f2n', q:'Fe³⁺', a:'ion hierro (III)', hint:'Hierro tiene más de un NOX posible'},
+  {cat:'iones', dir:'f2n', q:'Fe²⁺', a:'ion hierro (II)', hint:'Hierro con NOX +2'},
+  {cat:'iones', dir:'f2n', q:'Pd²⁺', a:'ion paladio (II)', hint:'ion + nombre + (NOX en romano)'},
+  {cat:'iones', dir:'f2n', q:'Mo⁶⁺', a:'ion molibdeno (VI)', hint:'NOX +6 → número romano VI'},
+  {cat:'iones', dir:'f2n', q:'Si²⁺', a:'ion silicio (II)', hint:'ion + silicio + (II)'},
+  {cat:'iones', dir:'f2n', q:'Cu²⁺', a:'ion cobre (II)', hint:'Cobre tiene NOX +1 y +2'},
+  {cat:'iones', dir:'f2n', q:'Cu⁺', a:'ion cobre (I)', hint:'Cobre con NOX +1'},
+  {cat:'iones', dir:'f2n', q:'Hg²⁺', a:'ion mercurio (II)', hint:'Mercurio con NOX +2'},
+  {cat:'iones', dir:'f2n', q:'Pb²⁺', a:'ion plomo (II)', hint:'Plomo con NOX +2'},
+  {cat:'iones', dir:'f2n', q:'Pb⁴⁺', a:'ion plomo (IV)', hint:'Plomo con NOX +4'},
+  {cat:'iones', dir:'f2n', q:'Sn²⁺', a:'ion estaño (II)', hint:'Estaño con NOX +2'},
+  {cat:'iones', dir:'f2n', q:'Sn⁴⁺', a:'ion estaño (IV)', hint:'Estaño con NOX +4'},
+  {cat:'iones', dir:'f2n', q:'Ni³⁺', a:'ion níquel (III)', hint:'ion + níquel + (III)'},
+  {cat:'iones', dir:'f2n', q:'Co²⁺', a:'ion cobalto (II)', hint:'Cobalto con NOX +2'},
+  {cat:'iones', dir:'f2n', q:'Mn³⁺', a:'ion manganeso (III)', hint:'Manganeso con NOX +3'},
+  {cat:'iones', dir:'f2n', q:'Mn⁶⁺', a:'ion manganeso (VI)', hint:'Manganeso con NOX +6'},
+  // Nombre → fórmula iones
+  {cat:'iones', dir:'n2f', q:'ion bromuro', a:'Br⁻', hint:'Bromo (Br) con carga -1'},
+  {cat:'iones', dir:'n2f', q:'ion cloruro', a:'Cl⁻', hint:'Cloro (Cl) con carga -1'},
+  {cat:'iones', dir:'n2f', q:'ion sulfuro', a:'S²⁻', hint:'Azufre (S) con carga -2'},
+  {cat:'iones', dir:'n2f', q:'ion yoduro', a:'I⁻', hint:'Yodo (I) con carga -1'},
+  {cat:'iones', dir:'n2f', q:'ion fluoruro', a:'F⁻', hint:'Flúor (F) con carga -1'},
+  {cat:'iones', dir:'n2f', q:'ion nitruro', a:'N³⁻', hint:'Nitrógeno (N) con carga -3'},
+  {cat:'iones', dir:'n2f', q:'ion fosfuro', a:'P³⁻', hint:'Fósforo (P) con carga -3'},
+  {cat:'iones', dir:'n2f', q:'ion carburo', a:'C⁴⁻', hint:'Carbono (C) con carga -4'},
+  {cat:'iones', dir:'n2f', q:'ion hierro (III)', a:'Fe³⁺', hint:'Hierro (Fe) con carga +3'},
+  {cat:'iones', dir:'n2f', q:'ion hierro (II)', a:'Fe²⁺', hint:'Hierro (Fe) con carga +2'},
+  {cat:'iones', dir:'n2f', q:'ion cobre (I)', a:'Cu⁺', hint:'Cobre (Cu) con carga +1'},
+  {cat:'iones', dir:'n2f', q:'ion cobre (II)', a:'Cu²⁺', hint:'Cobre (Cu) con carga +2'},
+  {cat:'iones', dir:'n2f', q:'ion zinc', a:'Zn²⁺', hint:'Zinc (Zn) con carga +2, NOX único'},
+  {cat:'iones', dir:'n2f', q:'ion estaño (IV)', a:'Sn⁴⁺', hint:'Estaño (Sn) con carga +4'},
+  {cat:'iones', dir:'n2f', q:'ion estaño (II)', a:'Sn²⁺', hint:'Estaño (Sn) con carga +2'},
+  {cat:'iones', dir:'n2f', q:'ion molibdeno (VI)', a:'Mo⁶⁺', hint:'Molibdeno (Mo) con carga +6'},
+  {cat:'iones', dir:'n2f', q:'ion plomo (II)', a:'Pb²⁺', hint:'Plomo (Pb) con carga +2'},
+  {cat:'iones', dir:'n2f', q:'ion níquel (III)', a:'Ni³⁺', hint:'Níquel (Ni) con carga +3'},
+
+  // --- ÓXIDOS DE METAL: fórmula → nombre ---
+  {cat:'oxidos', dir:'f2n', q:'Na₂O', a:'óxido de sodio', hint:'Sodio tiene NOX único (+1), no se pone romano'},
+  {cat:'oxidos', dir:'f2n', q:'CaO', a:'óxido de calcio', hint:'Calcio tiene NOX único (+2)'},
+  {cat:'oxidos', dir:'f2n', q:'FeO', a:'óxido de hierro (II)', hint:'Calcula: (x·1)+(−2·1)=0 → x=+2'},
+  {cat:'oxidos', dir:'f2n', q:'Fe₂O₃', a:'óxido de hierro (III)', hint:'Calcula: (x·2)+(−2·3)=0 → x=+3'},
+  {cat:'oxidos', dir:'f2n', q:'SnO₂', a:'óxido de estaño (IV)', hint:'Calcula: (x·1)+(−2·2)=0 → x=+4'},
+  {cat:'oxidos', dir:'f2n', q:'Cu₂O', a:'óxido de cobre (I)', hint:'Calcula: (x·2)+(−2·1)=0 → x=+1'},
+  {cat:'oxidos', dir:'f2n', q:'CuO', a:'óxido de cobre (II)', hint:'Calcula: x+(−2)=0 → x=+2'},
+  {cat:'oxidos', dir:'f2n', q:'Al₂O₃', a:'óxido de aluminio', hint:'Aluminio tiene NOX único (+3)'},
+  {cat:'oxidos', dir:'f2n', q:'BaO', a:'óxido de bario', hint:'Bario tiene NOX único (+2)'},
+  {cat:'oxidos', dir:'f2n', q:'SnO', a:'óxido de estaño (II)', hint:'Calcula: x+(−2)=0 → x=+2'},
+  {cat:'oxidos', dir:'f2n', q:'MgO', a:'óxido de magnesio', hint:'Magnesio tiene NOX único (+2)'},
+  {cat:'oxidos', dir:'f2n', q:'K₂O', a:'óxido de potasio', hint:'Potasio tiene NOX único (+1)'},
+  {cat:'oxidos', dir:'f2n', q:'PbO', a:'óxido de plomo (II)', hint:'Plomo tiene NOX +2 y +4'},
+  {cat:'oxidos', dir:'f2n', q:'PbO₂', a:'óxido de plomo (IV)', hint:'Calcula: x+(−2·2)=0 → x=+4'},
+  {cat:'oxidos', dir:'f2n', q:'Cr₂O₃', a:'óxido de cromo (III)', hint:'Calcula: (x·2)+(−2·3)=0 → x=+3'},
+  {cat:'oxidos', dir:'f2n', q:'MnO', a:'óxido de manganeso (II)', hint:'Calcula: x+(−2)=0 → x=+2'},
+  {cat:'oxidos', dir:'f2n', q:'MnO₂', a:'óxido de manganeso (IV)', hint:'Calcula: x+(−2·2)=0 → x=+4'},
+  // Óxidos metal: nombre → fórmula
+  {cat:'oxidos', dir:'n2f', q:'óxido de sodio', a:'Na₂O', hint:'Na tiene NOX +1, O tiene NOX -2 → MCM=2'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de calcio', a:'CaO', hint:'Ca²⁺ y O²⁻ → se cancelan directo'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de hierro (II)', a:'FeO', hint:'Fe²⁺ y O²⁻ → MCM=2, subíndices 1 y 1'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de hierro (III)', a:'Fe₂O₃', hint:'Fe³⁺ y O²⁻ → MCM=6 → Fe₂O₃'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de estaño (IV)', a:'SnO₂', hint:'Sn⁴⁺ y O²⁻ → MCM=4 → SnO₂'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de cobre (I)', a:'Cu₂O', hint:'Cu⁺ y O²⁻ → MCM=2 → Cu₂O'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de cobre (II)', a:'CuO', hint:'Cu²⁺ y O²⁻ → se cancelan'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de aluminio', a:'Al₂O₃', hint:'Al³⁺ y O²⁻ → MCM=6 → Al₂O₃'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de bario', a:'BaO', hint:'Ba²⁺ y O²⁻ → se cancelan'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de plomo (II)', a:'PbO', hint:'Pb²⁺ y O²⁻ → se cancelan'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de plomo (IV)', a:'PbO₂', hint:'Pb⁴⁺ y O²⁻ → MCM=4 → PbO₂'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de magnesio', a:'MgO', hint:'Mg²⁺ y O²⁻ → se cancelan'},
+  {cat:'oxidos', dir:'n2f', q:'óxido de potasio', a:'K₂O', hint:'K⁺ y O²⁻ → MCM=2 → K₂O'},
+  // Óxidos de no metal: fórmula → nombre
+  {cat:'oxidos', dir:'f2n', q:'CO₂', a:'dióxido de carbono', hint:'1 carbono, 2 oxígenos → di'},
+  {cat:'oxidos', dir:'f2n', q:'CO', a:'monóxido de carbono', hint:'1 carbono, 1 oxígeno → mono'},
+  {cat:'oxidos', dir:'f2n', q:'N₂O', a:'monóxido de dinitrógeno', hint:'2 N → di, 1 O → mono'},
+  {cat:'oxidos', dir:'f2n', q:'NO₂', a:'dióxido de nitrógeno', hint:'1 N → mono (se omite), 2 O → di'},
+  {cat:'oxidos', dir:'f2n', q:'SO₃', a:'trióxido de azufre', hint:'1 S, 3 O → tri'},
+  {cat:'oxidos', dir:'f2n', q:'SO₂', a:'dióxido de azufre', hint:'1 S, 2 O → di'},
+  {cat:'oxidos', dir:'f2n', q:'P₂O₅', a:'pentóxido de difósforo', hint:'2 P → di, 5 O → penta'},
+  {cat:'oxidos', dir:'f2n', q:'N₂O₃', a:'trióxido de dinitrógeno', hint:'2 N → di, 3 O → tri'},
+  {cat:'oxidos', dir:'f2n', q:'N₂O₅', a:'pentóxido de dinitrógeno', hint:'2 N → di, 5 O → penta'},
+  {cat:'oxidos', dir:'f2n', q:'Cl₂O₇', a:'heptóxido de dicloro', hint:'2 Cl → di, 7 O → hepta'},
+  // Óxidos de no metal: nombre → fórmula
+  {cat:'oxidos', dir:'n2f', q:'dióxido de carbono', a:'CO₂', hint:'di=2 oxígenos, carbono=C'},
+  {cat:'oxidos', dir:'n2f', q:'monóxido de carbono', a:'CO', hint:'mono=1 oxígeno, carbono=C'},
+  {cat:'oxidos', dir:'n2f', q:'monóxido de dinitrógeno', a:'N₂O', hint:'di=2 nitrógenos, mono=1 oxígeno'},
+  {cat:'oxidos', dir:'n2f', q:'dióxido de nitrógeno', a:'NO₂', hint:'1 nitrógeno, di=2 oxígenos'},
+  {cat:'oxidos', dir:'n2f', q:'trióxido de azufre', a:'SO₃', hint:'1 azufre, tri=3 oxígenos'},
+  {cat:'oxidos', dir:'n2f', q:'dióxido de azufre', a:'SO₂', hint:'1 azufre, di=2 oxígenos'},
+  {cat:'oxidos', dir:'n2f', q:'pentóxido de difósforo', a:'P₂O₅', hint:'di=2 fósforos, penta=5 oxígenos'},
+
+  // --- HIDRÓXIDOS: fórmula → nombre ---
+  {cat:'hidracidos', dir:'f2n', q:'HCl(aq)', a:'ácido clorhídrico', hint:'Acuoso: ácido + raíz cloro + hídrico'},
+  {cat:'hidracidos', dir:'f2n', q:'HBr(aq)', a:'ácido bromhídrico', hint:'Acuoso: ácido + raíz bromo + hídrico'},
+  {cat:'hidracidos', dir:'f2n', q:'HF(aq)', a:'ácido fluorhídrico', hint:'Acuoso: ácido + raíz flúor + hídrico'},
+  {cat:'hidracidos', dir:'f2n', q:'HI(aq)', a:'ácido yodhídrico', hint:'Acuoso: ácido + raíz yodo + hídrico'},
+  {cat:'hidracidos', dir:'f2n', q:'H₂S(aq)', a:'ácido sulfhídrico', hint:'Acuoso: ácido + raíz azufre + hídrico'},
+  {cat:'hidracidos', dir:'f2n', q:'HCl(g)', a:'cloruro de hidrógeno', hint:'Gaseoso: anión-uro + de hidrógeno'},
+  {cat:'hidracidos', dir:'f2n', q:'HBr(g)', a:'bromuro de hidrógeno', hint:'Gaseoso: anión-uro + de hidrógeno'},
+  {cat:'hidracidos', dir:'f2n', q:'HF(g)', a:'fluoruro de hidrógeno', hint:'Gaseoso: anión-uro + de hidrógeno'},
+  {cat:'hidracidos', dir:'f2n', q:'HI(g)', a:'yoduro de hidrógeno', hint:'Gaseoso: anión-uro + de hidrógeno'},
+  {cat:'hidracidos', dir:'f2n', q:'H₂S(g)', a:'sulfuro de hidrógeno', hint:'Gaseoso: sulfuro + de hidrógeno'},
+  // Hidróxidos: nombre → fórmula
+  {cat:'hidracidos', dir:'n2f', q:'ácido clorhídrico', a:'HCl(aq)', hint:'HCl en estado acuoso'},
+  {cat:'hidracidos', dir:'n2f', q:'ácido bromhídrico', a:'HBr(aq)', hint:'HBr en estado acuoso'},
+  {cat:'hidracidos', dir:'n2f', q:'ácido fluorhídrico', a:'HF(aq)', hint:'HF en estado acuoso'},
+  {cat:'hidracidos', dir:'n2f', q:'ácido yodhídrico', a:'HI(aq)', hint:'HI en estado acuoso'},
+  {cat:'hidracidos', dir:'n2f', q:'ácido sulfhídrico', a:'H₂S(aq)', hint:'H₂S en estado acuoso'},
+  {cat:'hidracidos', dir:'n2f', q:'cloruro de hidrógeno', a:'HCl(g)', hint:'HCl en estado gaseoso'},
+  {cat:'hidracidos', dir:'n2f', q:'bromuro de hidrógeno', a:'HBr(g)', hint:'HBr en estado gaseoso'},
+  {cat:'hidracidos', dir:'n2f', q:'fluoruro de hidrógeno', a:'HF(g)', hint:'HF en estado gaseoso'},
+  {cat:'hidracidos', dir:'n2f', q:'yoduro de hidrógeno', a:'HI(g)', hint:'HI en estado gaseoso'},
+  {cat:'hidracidos', dir:'n2f', q:'sulfuro de hidrógeno', a:'H₂S(g)', hint:'H₂S en estado gaseoso'},
+
+  // --- SALES BINARIAS: fórmula → nombre ---
+  {cat:'sales', dir:'f2n', q:'Fe₂S₃', a:'sulfuro de hierro (III)', hint:'Calcula NOX de Fe: (x·2)+(−2·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'Ca₃P₂', a:'fosfuro de calcio', hint:'Ca tiene NOX único +2'},
+  {cat:'sales', dir:'f2n', q:'Co₃N₂', a:'nitruro de cobalto (II)', hint:'Calcula NOX de Co: (x·3)+(−3·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'SnI₄', a:'yoduro de estaño (IV)', hint:'Calcula NOX de Sn: (x·1)+(−1·4)=0 → x=+4'},
+  {cat:'sales', dir:'f2n', q:'NiBr₃', a:'bromuro de níquel (III)', hint:'Calcula NOX de Ni: (x·1)+(−1·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'Al₄C₃', a:'carburo de aluminio', hint:'Al tiene NOX único +3'},
+  {cat:'sales', dir:'f2n', q:'KBr', a:'bromuro de potasio', hint:'K tiene NOX único +1'},
+  {cat:'sales', dir:'f2n', q:'AgBr', a:'bromuro de plata', hint:'Ag tiene NOX único +1'},
+  {cat:'sales', dir:'f2n', q:'MgI₂', a:'yoduro de magnesio', hint:'Mg tiene NOX único +2'},
+  {cat:'sales', dir:'f2n', q:'CaF₂', a:'fluoruro de calcio', hint:'Ca tiene NOX único +2'},
+  {cat:'sales', dir:'f2n', q:'VCl₃', a:'cloruro de vanadio (III)', hint:'Calcula NOX de V: (x·1)+(−1·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'MnS₃', a:'sulfuro de manganeso (VI)', hint:'Calcula NOX de Mn: (x·1)+(−2·3)=0 → x=+6'},
+  {cat:'sales', dir:'f2n', q:'Mn₂S₃', a:'sulfuro de manganeso (III)', hint:'Calcula NOX de Mn: (x·2)+(−2·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'FeCl₃', a:'cloruro de hierro (III)', hint:'Calcula NOX de Fe: (x·1)+(−1·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'HgCl₂', a:'cloruro de mercurio (II)', hint:'Calcula NOX de Hg: (x·1)+(−1·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'PbS', a:'sulfuro de plomo (II)', hint:'Calcula NOX de Pb: (x·1)+(−2·1)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'SnCl₄', a:'cloruro de estaño (IV)', hint:'Calcula NOX de Sn: (x·1)+(−1·4)=0 → x=+4'},
+  {cat:'sales', dir:'f2n', q:'CuCl₂', a:'cloruro de cobre (II)', hint:'Calcula NOX de Cu: (x·1)+(−1·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'NaCl', a:'cloruro de sodio', hint:'Na tiene NOX único +1'},
+  {cat:'sales', dir:'f2n', q:'BaF₂', a:'fluoruro de bario', hint:'Ba tiene NOX único +2'},
+  {cat:'sales', dir:'f2n', q:'AlCl₃', a:'cloruro de aluminio', hint:'Al tiene NOX único +3'},
+  {cat:'sales', dir:'f2n', q:'CdI₂', a:'yoduro de cadmio (II)', hint:'Calcula NOX de Cd: (x·1)+(−1·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'CoCl₂', a:'cloruro de cobalto (II)', hint:'Calcula NOX de Co: (x·1)+(−1·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'MgF₂', a:'fluoruro de magnesio', hint:'Mg tiene NOX único +2'},
+  {cat:'sales', dir:'f2n', q:'FeBr₂', a:'bromuro de hierro (II)', hint:'Calcula NOX de Fe: (x·1)+(−1·2)=0 → x=+2'},
+  {cat:'sales', dir:'f2n', q:'Mn₂S₃', a:'sulfuro de manganeso (III)', hint:'(x·2)+(−2·3)=0 → x=+3'},
+  {cat:'sales', dir:'f2n', q:'PbI₂', a:'yoduro de plomo (II)', hint:'Calcula NOX de Pb: (x·1)+(−1·2)=0 → x=+2'},
+  // Sales: nombre → fórmula
+  {cat:'sales', dir:'n2f', q:'sulfuro de hierro (III)', a:'Fe₂S₃', hint:'Fe³⁺ y S²⁻ → MCM(3,2)=6 → Fe₂S₃'},
+  {cat:'sales', dir:'n2f', q:'fosfuro de calcio', a:'Ca₃P₂', hint:'Ca²⁺ y P³⁻ → MCM(2,3)=6 → Ca₃P₂'},
+  {cat:'sales', dir:'n2f', q:'nitruro de cobalto (II)', a:'Co₃N₂', hint:'Co²⁺ y N³⁻ → MCM(2,3)=6 → Co₃N₂'},
+  {cat:'sales', dir:'n2f', q:'yoduro de estaño (IV)', a:'SnI₄', hint:'Sn⁴⁺ y I⁻ → MCM(4,1)=4 → SnI₄'},
+  {cat:'sales', dir:'n2f', q:'bromuro de níquel (III)', a:'NiBr₃', hint:'Ni³⁺ y Br⁻ → MCM(3,1)=3 → NiBr₃'},
+  {cat:'sales', dir:'n2f', q:'carburo de aluminio', a:'Al₄C₃', hint:'Al³⁺ y C⁴⁻ → MCM(3,4)=12 → Al₄C₃'},
+  {cat:'sales', dir:'n2f', q:'bromuro de potasio', a:'KBr', hint:'K⁺ y Br⁻ → se cancelan → KBr'},
+  {cat:'sales', dir:'n2f', q:'yoduro de magnesio', a:'MgI₂', hint:'Mg²⁺ y I⁻ → MCM(2,1)=2 → MgI₂'},
+  {cat:'sales', dir:'n2f', q:'fluoruro de calcio', a:'CaF₂', hint:'Ca²⁺ y F⁻ → MCM(2,1)=2 → CaF₂'},
+  {cat:'sales', dir:'n2f', q:'cloruro de vanadio (III)', a:'VCl₃', hint:'V³⁺ y Cl⁻ → MCM(3,1)=3 → VCl₃'},
+  {cat:'sales', dir:'n2f', q:'cloruro de hierro (III)', a:'FeCl₃', hint:'Fe³⁺ y Cl⁻ → MCM(3,1)=3 → FeCl₃'},
+  {cat:'sales', dir:'n2f', q:'cloruro de mercurio (II)', a:'HgCl₂', hint:'Hg²⁺ y Cl⁻ → MCM(2,1)=2 → HgCl₂'},
+  {cat:'sales', dir:'n2f', q:'cloruro de sodio', a:'NaCl', hint:'Na⁺ y Cl⁻ → se cancelan → NaCl'},
+  {cat:'sales', dir:'n2f', q:'fluoruro de bario', a:'BaF₂', hint:'Ba²⁺ y F⁻ → MCM(2,1)=2 → BaF₂'},
+  {cat:'sales', dir:'n2f', q:'cloruro de aluminio', a:'AlCl₃', hint:'Al³⁺ y Cl⁻ → MCM(3,1)=3 → AlCl₃'},
+  {cat:'sales', dir:'n2f', q:'sulfuro de plomo (II)', a:'PbS', hint:'Pb²⁺ y S²⁻ → se cancelan → PbS'},
+  {cat:'sales', dir:'n2f', q:'cloruro de estaño (IV)', a:'SnCl₄', hint:'Sn⁴⁺ y Cl⁻ → MCM(4,1)=4 → SnCl₄'},
+  {cat:'sales', dir:'n2f', q:'cloruro de cobre (II)', a:'CuCl₂', hint:'Cu²⁺ y Cl⁻ → MCM(2,1)=2 → CuCl₂'},
+  {cat:'sales', dir:'n2f', q:'bromuro de hierro (II)', a:'FeBr₂', hint:'Fe²⁺ y Br⁻ → MCM(2,1)=2 → FeBr₂'},
+  {cat:'sales', dir:'n2f', q:'sulfuro de manganeso (III)', a:'Mn₂S₃', hint:'Mn³⁺ y S²⁻ → MCM(3,2)=6 → Mn₂S₃'},
+  {cat:'sales', dir:'n2f', q:'fluoruro de magnesio', a:'MgF₂', hint:'Mg²⁺ y F⁻ → MCM(2,1)=2 → MgF₂'},
+  {cat:'sales', dir:'n2f', q:'yoduro de plomo (II)', a:'PbI₂', hint:'Pb²⁺ y I⁻ → MCM(2,1)=2 → PbI₂'},
+];
+
+const TOPIC_LABELS = { iones:'Iones', oxidos:'Óxidos', hidracidos:'Hidróxidos', sales:'Sales binarias' };
+const DIR_LABELS = { f2n:'→ Escribe el nombre', n2f:'→ Escribe la fórmula' };
+
+let currentFilter = 'todos';
+let currentEx = null;
+let correct = 0, wrong = 0, streak = 0;
+let usedIndices = [];
+
+let examPool = [], examIdx = 0, examAnswers = [];
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+}
+function goHub() { showScreen('hub'); }
+
+function showTheory(t) {
+  const th = THEORY[t];
+  document.getElementById('theory-title').textContent = th.title;
+  document.getElementById('theory-sub').textContent = th.sub;
+  document.getElementById('theory-content').innerHTML = th.content;
+  showScreen('theory');
+}
+
+function getPool() {
+  if (currentFilter === 'todos') return BANK;
+  return BANK.filter(e => e.cat === currentFilter);
+}
+
+function setFilter(f, btn) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  usedIndices = [];
+  loadStudyEx();
+}
+
+function startStudy() {
+  correct = 0; wrong = 0; streak = 0;
+  usedIndices = [];
+  updateScores();
+  showScreen('study');
+  loadStudyEx();
+}
+
+function loadStudyEx() {
+  const pool = getPool();
+  document.getElementById('bank-count').textContent = pool.length;
+  // pick unused, or reset
+  let available = pool.map((_,i)=>i).filter(i=>!usedIndices.includes(i));
+  if (available.length === 0) { usedIndices = []; available = pool.map((_,i)=>i); }
+  const idx = available[Math.floor(Math.random()*available.length)];
+  usedIndices.push(idx);
+  currentEx = pool[idx];
+
+  document.getElementById('ex-badge').textContent = TOPIC_LABELS[currentEx.cat];
+  document.getElementById('ex-q').textContent = currentEx.q;
+  document.getElementById('ex-dir').textContent = DIR_LABELS[currentEx.dir];
+  document.getElementById('ex-in').value = '';
+  document.getElementById('fb-study').style.display = 'none';
+  document.getElementById('btn-next-study').style.display = 'none';
+  document.getElementById('btn-hint').style.display = 'inline-block';
+  setTimeout(()=>document.getElementById('ex-in').focus(), 50);
+}
+
+function updateScores() {
+  document.getElementById('sc-correct').textContent = correct;
+  document.getElementById('sc-wrong').textContent = wrong;
+  document.getElementById('sc-streak').textContent = streak;
+}
+
+function norm(s) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\s+/g,' ').trim()
+    .replace(/[₀₁₂₃₄₅₆₇₈₉]/g,d=>'0123456789'['₀₁₂₃₄₅₆₇₈₉'.indexOf(d)])
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]/g,'');
+}
+
+function isCorrect(user, answer) {
+  const u = norm(user), a = norm(answer);
+  return u === a || u.replace(/[()]/g,'') === a.replace(/[()]/g,'');
+}
+
+function checkStudy() {
+  if (!currentEx) return;
+  const val = document.getElementById('ex-in').value.trim();
+  if (!val) return;
+  const fb = document.getElementById('fb-study');
+  fb.style.display = 'block';
+  document.getElementById('btn-next-study').style.display = 'inline-block';
+  document.getElementById('btn-hint').style.display = 'none';
+  if (isCorrect(val, currentEx.a)) {
+    correct++; streak++;
+    fb.className = 'feedback-box correct';
+    fb.innerHTML = '✓ ¡Correcto! La respuesta es: <strong>' + currentEx.a + '</strong>';
+  } else {
+    wrong++; streak = 0;
+    fb.className = 'feedback-box wrong';
+    fb.innerHTML = '✗ Incorrecto. Respuesta correcta: <strong>' + currentEx.a + '</strong>';
+  }
+  updateScores();
+}
+
+function showHint() {
+  if (!currentEx) return;
+  const fb = document.getElementById('fb-study');
+  fb.style.display = 'block';
+  fb.className = 'feedback-box hint';
+  fb.innerHTML = '💡 Pista: ' + currentEx.hint;
+}
+
+function nextStudy() { loadStudyEx(); }
+function skipStudy() { loadStudyEx(); }
+
+document.addEventListener('keydown', function(e) {
+  if (document.getElementById('screen-study').classList.contains('active')) {
+    if (e.key === 'Enter') {
+      if (document.getElementById('btn-next-study').style.display !== 'none') nextStudy();
+      else checkStudy();
+    }
+  }
+  if (document.getElementById('screen-exam').classList.contains('active')) {
+    if (e.key === 'Enter') {
+      if (document.getElementById('btn-next-exam').style.display !== 'none') nextExam();
+      else checkExam();
+    }
+  }
+});
+
+// EXAM
+function startExam() {
+  const shuffled = [...BANK].sort(()=>Math.random()-0.5).slice(0,10);
+  examPool = shuffled;
+  examIdx = 0;
+  examAnswers = [];
+  document.getElementById('exam-results').style.display = 'none';
+  document.getElementById('exam-exercise-area').style.display = 'block';
+  showScreen('exam');
+  loadExamQ();
+}
+
+function loadExamQ() {
+  const q = examPool[examIdx];
+  const pct = (examIdx/examPool.length)*100;
+  document.getElementById('exam-bar').style.width = pct + '%';
+  document.getElementById('exam-counter').textContent = 'Pregunta ' + (examIdx+1) + ' de ' + examPool.length;
+  document.getElementById('exam-badge').textContent = TOPIC_LABELS[q.cat];
+  document.getElementById('exam-q').textContent = q.q;
+  document.getElementById('exam-dir').textContent = DIR_LABELS[q.dir];
+  document.getElementById('exam-in').value = '';
+  document.getElementById('fb-exam').style.display = 'none';
+  document.getElementById('btn-next-exam').style.display = 'none';
+  setTimeout(()=>document.getElementById('exam-in').focus(), 50);
+}
+
+function checkExam() {
+  const q = examPool[examIdx];
+  const val = document.getElementById('exam-in').value.trim();
+  if (!val) return;
+  const ok = isCorrect(val, q.a);
+  examAnswers.push({ q, user: val, ok });
+  const fb = document.getElementById('fb-exam');
+  fb.style.display = 'block';
+  fb.className = 'feedback-box ' + (ok ? 'correct' : 'wrong');
+  fb.innerHTML = ok ? '✓ Correcto' : '✗ Respuesta correcta: <strong>' + q.a + '</strong>';
+  document.getElementById('btn-next-exam').style.display = 'inline-block';
+}
+
+function nextExam() {
+  examIdx++;
+  if (examIdx >= examPool.length) showExamResults();
+  else loadExamQ();
+}
+
+function showExamResults() {
+  document.getElementById('exam-bar').style.width = '100%';
+  document.getElementById('exam-exercise-area').style.display = 'none';
+  const ok = examAnswers.filter(a=>a.ok).length;
+  const pct = Math.round((ok/examPool.length)*100);
+  const emoji = pct>=90?'🎉':pct>=70?'👍':pct>=50?'📚':'💪';
+  const msg = pct>=90?'¡Dominio excelente!':pct>=70?'Buen trabajo, sigue así':pct>=50?'Vas bien, sigue practicando':'Repasa la teoría e intenta de nuevo';
+  const items = examAnswers.map(a=>`
+    <div class="result-item">
+      <div class="result-icon ${a.ok?'ok':'bad'}">${a.ok?'✓':'✗'}</div>
+      <div style="flex:1">
+        <div class="result-q">${a.q.q}</div>
+        <div class="result-a">${a.q.a}</div>
+        ${!a.ok ? '<div class="result-yours">Tu respuesta: '+a.user+'</div>' : ''}
+      </div>
+    </div>`).join('');
+  document.getElementById('exam-results').style.display = 'block';
+  document.getElementById('exam-results').innerHTML = `
+    <div class="results-header">
+      <div class="results-pct">${emoji} ${pct}%</div>
+      <div class="results-msg">${ok} de ${examPool.length} correctas · ${msg}</div>
+    </div>
+    <div class="results-list">${items}</div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="startExam()">Nuevo examen</button>
+      <button class="btn-secondary" onclick="goHub()">← Inicio</button>
+    </div>`;
+}
+</script>
+</body>
+</html>
